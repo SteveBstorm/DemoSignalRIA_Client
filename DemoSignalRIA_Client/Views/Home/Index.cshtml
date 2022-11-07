@@ -1,0 +1,32 @@
+﻿
+<div>
+    <div id="message" style="border : black 1px solid;">
+        <ul id="listmessage">
+            
+        </ul>
+    </div>
+    <div id="input">
+        Votre message : <input type="text" id="newmessage"/>
+        <button id="send">Envoyer</button>
+    </div>
+</div>
+<script src="~/lib/signalR/signalr.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
+    //https://localhost:7186
+
+    connection.on("receiveMessage", (message) => {
+        const li = document.createElement("li");
+        li.textContent = message;
+        document.getElementById("listmessage").appendChild(li);
+    })
+
+    connection.start().catch(err => console.error(err));
+
+    document.getElementById("send").addEventListener("click", event => {
+        const message = document.getElementById("newmessage").value;
+        connection.invoke("SendMessage", message).catch(err => console.error(err));
+        event.preventDefault();
+    })
+
+</script>
